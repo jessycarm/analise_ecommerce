@@ -80,5 +80,24 @@ Etapa 3: Correção dos tipos de dados
     Apresentação dos dados após ajustes: 
         dtypes: Int64(1), category(1), datetime64[ns](1), float64(1), int64(1), object(3)  
         memory usage: 30.0+ MB
-        
+    
+Etapa 4: Tratamento de Duplicatas
 
+    Registros duplicados podem distorcer receitas.
+        - Checagem de duplicatas completas;
+        - Remoção de duplicatas exatas.
+
+    Quantidade de duplicatas: 5269
+    Porcentagem de Duplicatas: (0.972%)
+    Quantidade de duplicatas após limpeza: 0
+
+    - Também foi feito uma busca por duplicatas parciais no InvoiceNo + StockCode
+    Quantidade de duplicatas parciais em InvoiceNo + StockCode: 5415
+
+Etapa 5: Tratamento de devoluções/cancelamentos
+
+    Quantidades negativas usualmente significam devolução e devem ser tratadas diferente do faturamento.
+    - marcamos as devoluções negativas;
+    - calculamos quantos registros são devoluções.
+    Quantidade de devoluções: 10587
+    Taxa por mil registros: 19.73%

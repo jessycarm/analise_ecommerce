@@ -76,3 +76,5 @@ taxa_por_mil = ((df['is_return'].mean()*1000).round(2))
 
 print("\nQuantidade de devoluções:", num_devolucoes)
 print(f"Taxa por mil registros: {taxa_por_mil}%")
+
+# --------- Passo 6: Criar uma coluna para colocar as informações de faturamento e métricas básicas ---------------------
