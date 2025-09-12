@@ -78,3 +78,34 @@ print("\nQuantidade de devoluções:", num_devolucoes)
 print(f"Taxa por mil registros: {taxa_por_mil}%")
 
 # --------- Passo 6: Criar uma coluna para colocar as informações de faturamento e métricas básicas ---------------------
+
+df['revenue'] = df['Quantity'] * df['UnitPrice']
+
+#receita total, incluindo as devoluções
+receita_total = df['revenue'].sum()
+
+#receita somente de vendas
+revenue_sales = df.loc[~df['is_return'], 'revenue'].sum()
+
+print(f"\nReceita total: R$ {round(receita_total, 2)}")
+print(f"Receita Bruta: R$ {revenue_sales:.2f}")
+
+#diferença entre receitas
+
+diferenca = revenue_sales - receita_total
+print(f"Impacto das devoluções: R$ {diferenca:.2f}\n")
+
+# --------- Passo 7: Padronização dos Dados em formato texto ---------------------
+df['Description'] = df['Description'].astype(str).str.strip().str.upper()
+df['Country'] = df['Country'].astype(str).str.strip()
+df['Country'] = df['Country'].astype(str).str.strip().str.upper()
+
+#mapeando paises
+paises_unicos = df['Country'].unique()
+print(paises_unicos)
+
+#contagem de paises
+contagem_paises = df['Country'].value_counts()
+porcentagem_paises = (contagem_paises / len(df) * 100 )
+print(f"Total de Registro por País: {contagem_paises}\n")
+print(f"Percentual de Registros por País: {porcentagem_paises.round(2)}\n")
