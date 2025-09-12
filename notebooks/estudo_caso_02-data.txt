@@ -1,0 +1,84 @@
+O que está sendo feito?
+
+Etapa 0: Importação e Carregamento
+    - Importamos as bibliotecas Pandas e Numpy que serão utilizadas para 
+    tratar os dados e Carregamos o arquivo que será analisado
+
+Etapa 1: Verificação da estrutura 
+    - Através do df.shape, verificamos a quantidade de linhas e colunas (541909, 8). 
+    Ou seja, temos 541909 linhas de arquivo e uma divisão de 8 colunas.
+    - Para ter uma base de como os dados estão inseridos, vamos utilizar o df.head(),
+    para coletar uma amostra de como está a tabela.
+        
+        [5 linhas x 8 colunas]
+            InvoiceNo StockCode  ... CustomerID         Country
+            0    536365    85123A  ...    17850.0  United Kingdom
+            1    536365     71053  ...    17850.0  United Kingdom
+            2    536365    84406B  ...    17850.0  United Kingdom
+            3    536365    84029G  ...    17850.0  United Kingdom
+            4    536365    84029E  ...    17850.0  United Kingdom
+
+    - Agora que sabemos como está estruturada, vamos verificar os tipos de dados e a contagem non-null
+        
+        RangeIndex: 541909 entries, 0 to 541908
+        Data columns (total 8 columns):
+        #   Column       Non-Null Count   Dtype
+        ---  ------       --------------   -----
+        0   InvoiceNo    541909 non-null  object
+        1   StockCode    541909 non-null  object
+        2   Description  540455 non-null  object
+        3   Quantity     541909 non-null  int64
+        4   InvoiceDate  541909 non-null  object
+        5   UnitPrice    541909 non-null  float64
+        6   CustomerID   406829 non-null  float64
+        7   Country      541909 non-null  object
+        dtypes: float64(2), int64(1), object(5)
+        memory usage: 33.1+ MB
+        None
+
+        Em resumo: 
+        - temos 541909 entradas, em uma contagem de 0 a 541908;
+        - divididos em um total de 8 colunas;
+        - InovoiceNo: Dados em formato de object(texto), deveria está como string ou int, se não houvesse letras adicionadas;
+        - StockCode: Dados em formato object, o que é normal, por ser geralmente um código alfanumérico, mas deveria ser string;
+        - Description: Dados em formato object e está com valores faltando;
+        - Quantity: Dados em formato int64. Em casos de valores negativos, pode indicar devolução;
+        - InovoiceDate: Dados em formato object. O que é um problema, pois deveria ser datetime;
+        - UnitPrice: Dados em formato float64. Ok, mas pode haver valores com 0 ou negativos;
+        - CustomerID: Dados em formato flaot64. Os dados deveriam estar no formato int64, por ser uma ID. Está como float por ter dados ausentes;
+        - Country: está em formato object, mas podia ser string.
+
+        Os dados estão totatizados como:
+        flaot64(2), int64(1), object(5)
+        memory usage: 33.1+ MB
+        - duas colunas com o tipo float
+        - uma coluna com o tipo int
+        - cinco colunas com o tipo object
+    
+    - Agora que verificamos os tipos e identificamos colunas com valores faltantes, vamos calcular onde estão estes valores usando df.isnull().sum():
+
+        InvoiceNo           0
+        StockCode           0
+        Description      1454
+        Quantity            0
+        InvoiceDate         0
+        UnitPrice           0
+        CustomerID     135080
+        Country             0
+
+        O que identificamos:
+            - Existem 1454 descrições de itens faltando. Apesar de termos todos os códigos, não saberemos detalhes sobre a venda;
+            - E o problema maior: 135.080 clientes sem identificação. O que pode ser uma venda avulsa ou uma venda não rastreada.
+
+Etapa 3: Correção dos tipos de dados 
+
+    - Correção do formato do tipo da data para datetime;
+    - Correção da ID para o formato do tipo int;
+    - Correção para o tipo string os campos: InvoiceNo, StockCode;
+    - Tranformação do Country em campo categórico para economizar memória.
+
+    Apresentação dos dados após ajustes: 
+        dtypes: Int64(1), category(1), datetime64[ns](1), float64(1), int64(1), object(3)  
+        memory usage: 30.0+ MB
+        
+
