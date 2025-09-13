@@ -23,9 +23,10 @@ analise_ecommerce/
 
 1. **Clonar o repositório**:
 
-```bash
 git clone https://github.com/jessycarm/analise_ecommerce.git
 cd analise_ecommerce
+
+
 
 2. **Criar e ativar ambiente virtual (opcional, recomendado)**:
 
@@ -41,7 +42,7 @@ pip install -r requirements.txt
 
 Observações
 
-A pasta data/ contém exemplos ou dados fictícios; dados grandes reais não estão versionados.
+A pasta data/ contém exemplos ou dados já tratados; dados grandes reais não estão versionados.
 
 Use a pasta reports/ para armazenar relatórios ou gráficos finais.
 

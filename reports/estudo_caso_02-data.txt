@@ -1,25 +1,23 @@
-O que está sendo feito?
+Relatório de Etapas de Limpeza de Dados
 
 Etapa 0: Importação e Carregamento
-    - Importamos as bibliotecas Pandas e Numpy que serão utilizadas para 
-    tratar os dados e Carregamos o arquivo que será analisado
 
-Etapa 1: Verificação da estrutura 
-    - Através do df.shape, verificamos a quantidade de linhas e colunas (541909, 8). 
-    Ou seja, temos 541909 linhas de arquivo e uma divisão de 8 colunas.
-    - Para ter uma base de como os dados estão inseridos, vamos utilizar o df.head(),
-    para coletar uma amostra de como está a tabela.
-        
-        [5 linhas x 8 colunas]
-            InvoiceNo StockCode  ... CustomerID         Country
+    - Importamos as bibliotecas Pandas e NumPy, que serão utilizadas para o tratamento dos dados.
+    - Carregamos o arquivo que será analisado.
+
+Etapa 1: Verificação da Estrutura
+
+    - Com df.shape, identificamos a quantidade de linhas e colunas: 541.909 linhas e 8 colunas.
+    - Utilizamos df.head() para visualizar uma amostra da tabela.
+       Exemplo da saída ([5 linhas x 8 colunas]): 
+         InvoiceNo StockCode  ... CustomerID         Country
             0    536365    85123A  ...    17850.0  United Kingdom
             1    536365     71053  ...    17850.0  United Kingdom
             2    536365    84406B  ...    17850.0  United Kingdom
             3    536365    84029G  ...    17850.0  United Kingdom
             4    536365    84029E  ...    17850.0  United Kingdom
 
-    - Agora que sabemos como está estruturada, vamos verificar os tipos de dados e a contagem non-null
-        
+   - Verificação dos tipos de dados e valores não nulos:
         RangeIndex: 541909 entries, 0 to 541908
         Data columns (total 8 columns):
         #   Column       Non-Null Count   Dtype
@@ -34,166 +32,78 @@ Etapa 1: Verificação da estrutura
         7   Country      541909 non-null  object
         dtypes: float64(2), int64(1), object(5)
         memory usage: 33.1+ MB
-        None
 
-        Em resumo: 
-        - temos 541909 entradas, em uma contagem de 0 a 541908;
-        - divididos em um total de 8 colunas;
-        - InovoiceNo: Dados em formato de object(texto), deveria está como string ou int, se não houvesse letras adicionadas;
-        - StockCode: Dados em formato object, o que é normal, por ser geralmente um código alfanumérico, mas deveria ser string;
-        - Description: Dados em formato object e está com valores faltando;
-        - Quantity: Dados em formato int64. Em casos de valores negativos, pode indicar devolução;
-        - InovoiceDate: Dados em formato object. O que é um problema, pois deveria ser datetime;
-        - UnitPrice: Dados em formato float64. Ok, mas pode haver valores com 0 ou negativos;
-        - CustomerID: Dados em formato flaot64. Os dados deveriam estar no formato int64, por ser uma ID. Está como float por ter dados ausentes;
-        - Country: está em formato object, mas podia ser string.
+        Resumo das colunas:
 
-        Os dados estão totatizados como:
-        flaot64(2), int64(1), object(5)
-        memory usage: 33.1+ MB
-        - duas colunas com o tipo float
-        - uma coluna com o tipo int
-        - cinco colunas com o tipo object
-    
-    - Agora que verificamos os tipos e identificamos colunas com valores faltantes, vamos calcular onde estão estes valores usando df.isnull().sum():
+            - InvoiceNo: object → deveria ser string; se numérico, poderia estar em int.        
+            - StockCode: object (correto, geralmente alfanumérico).
+            - Description: object, contém valores nulos (1.454 ausências).
+            - Quantity: int64, valores negativos indicam devoluções.
+            - InvoiceDate: object, deveria ser datetime.
+            - UnitPrice: float64, pode conter valores 0 ou negativos.
+            - CustomerID: float64, deveria ser int64. Está como float devido a 135.080 ausências.
+            - Country: object, deveria ser string categórica. 
 
-        InvoiceNo           0
-        StockCode           0
-        Description      1454
-        Quantity            0
-        InvoiceDate         0
-        UnitPrice           0
-        CustomerID     135080
-        Country             0
+        Dados faltantes (df.isnull().sum()):
+            - Description → 1.454 valores ausentes.
+            - CustomerID → 135.080 valores ausentes. 
 
-        O que identificamos:
-            - Existem 1454 descrições de itens faltando. Apesar de termos todos os códigos, não saberemos detalhes sobre a venda;
-            - E o problema maior: 135.080 clientes sem identificação. O que pode ser uma venda avulsa ou uma venda não rastreada.
+Etapa 2: Correção dos Tipos de Dados
 
-Etapa 3: Correção dos tipos de dados 
-
-    - Correção do formato do tipo da data para datetime;
-    - Correção da ID para o formato do tipo int;
-    - Correção para o tipo string os campos: InvoiceNo, StockCode;
-    - Tranformação do Country em campo categórico para economizar memória.
-
-    Apresentação dos dados após ajustes: 
-        dtypes: Int64(1), category(1), datetime64[ns](1), float64(1), int64(1), object(3)  
+    - Conversão de InvoiceDate para datetime.
+    - Conversão de CustomerID para int64.
+    - Conversão de InvoiceNo e StockCode para string.
+    - Conversão de Country para category (otimização de memória).
+        Após ajustes:
+        dtypes: Int64(1), category(1), datetime64 , float64(1), int64(1), object(3)  
         memory usage: 30.0+ MB
-    
-Etapa 4: Tratamento de Duplicatas
 
-    Registros duplicados podem distorcer receitas.
-        - Checagem de duplicatas completas;
-        - Remoção de duplicatas exatas.
+Etapa 3: Tratamento de Duplicatas
 
-    Quantidade de duplicatas: 5269
-    Porcentagem de Duplicatas: (0.972%)
-    Quantidade de duplicatas após limpeza: 0
+    - Identificação e remoção de duplicatas completas.
+    - Duplicatas encontradas: 5.269 (0,97%).
+    - Após a limpeza: 0 duplicatas.
+    - Identificação de duplicatas parciais (InvoiceNo + StockCode): 5.415 registros.
 
-    - Também foi feito uma busca por duplicatas parciais no InvoiceNo + StockCode
-    Quantidade de duplicatas parciais em InvoiceNo + StockCode: 5415
+Etapa 4: Tratamento de Devoluções/Cancelamentos
 
-Etapa 5: Tratamento de devoluções/cancelamentos
+    - Quantidade negativa indica devolução.
+    - Registros de devoluções: 10.587 → 19,73 por mil registros.
 
-    Quantidades negativas usualmente significam devolução e devem ser tratadas diferente do faturamento.
-    - marcamos as devoluções negativas;
-    - calculamos quantos registros são devoluções.
-    Quantidade de devoluções: 10587
-    Taxa por mil registros: 19.73%
+Etapa 5: Informações de Faturamento
 
-Etapa 6: Informações de faturamento e métricas básicas
-    Calculando a Receita Total, a Receita Bruta e o Impacto das Devoluções.
-    - Criamos uma tabela para receber o valor da receita;
-    - Calculamos a receita total, incluindo o valor das devoluções;
-    - Calculamos a receita bruta, retirando o valor das devoluções e calculamos só as vendas;
-    - Geramos o impacto das devoluções no faturamento total.
+    - Receita Total (com devoluções): R$ 9.726.003,05.
+    - Receita Bruta (sem devoluções): R$ 10.619.982,78.
+    - Impacto das devoluções: R$ 893.979,73.
 
-    Receita total: R$ 9726003.05
-    Receita Bruta: R$ 10619982.78
-    Impacto das devoluções: R$ 893979.73
+Etapa 6: Padronização dos Dados
 
-Etapa 7: Padronização dos Dados 
-    Nomes de produtos e paises podem ter variações. A padronização ajuda a agrupar os dados corretamente
-    - Será removido os espaços e uniformizar a escrita.
-    - Fiz um mapeamento dos paises cadastrados para verificação de nomes escritos em idiomas diferentes;
-    - Aproveitei e solicitei a frequencia que cada pais aparece nos registros
+    - Remoção de espaços extras e uniformização de nomes.
+    - Padronização de países (idiomas diferentes, abreviações, erros de digitação).
+    - Frequência por país calculada.
 
-    United Kingdom          490299
-    Germany                   9480
-    France                    8541
-    EIRE                      8184
-    Spain                     2528
-    Netherlands               2371
-    Belgium                   2069
-    Switzerland               1994
-    Portugal                  1510
-    Australia                 1258
-    Norway                    1086
-    Italy                      803
-    Channel Islands            757
-    Finland                    695
-    Cyprus                     611
-    Sweden                     461
-    Unspecified                442
-    Austria                    401
-    Denmark                    389
-    Japan                      358
-    Poland                     341
-    Israel                     294
-    USA                        291
-    Hong Kong                  284
-    Singapore                  229
-    Iceland                    182
-    Canada                     151
-    Greece                     146
-    Malta                      127
-    United Arab Emirates        68
-    European Community          61
-    RSA                         58
-    Lebanon                     45
-    Lithuania                   35
-    Brazil                      32
-    Czech Republic              30
-    Bahrain                     19
-    Saudi Arabia                10
+        Exemplo:
 
-    - Percentual de cada pais:
-    United Kingdom          91.36
-    Germany                  1.77
-    France                   1.59
-    EIRE                     1.53
-    Spain                    0.47
-    Netherlands              0.44
-    Belgium                  0.39
-    Switzerland              0.37
-    Portugal                 0.28
-    Australia                0.23
-    Norway                   0.20
-    Italy                    0.15
-    Channel Islands          0.14
-    Finland                  0.13
-    Cyprus                   0.11
-    Sweden                   0.09
-    Unspecified              0.08
-    Austria                  0.07
-    Denmark                  0.07
-    Japan                    0.07
-    Poland                   0.06
-    Israel                   0.05
-    USA                      0.05
-    Hong Kong                0.05
-    Singapore                0.04
-    Iceland                  0.03
-    Canada                   0.03
-    Greece                   0.03
-    Malta                    0.02
-    United Arab Emirates     0.01
-    European Community       0.01
-    RSA                      0.01
-    Lebanon                  0.01
-    Lithuania                0.01
-    Brazil                   0.01
-    Czech Republic           0.01
-    Bahrain                  0.00
-    Saudi Arabia             0.00
+        - United Kingdom → 490.299 registros (91,36%)
+        - Germany → 9.480 registros (1,77%)
+        - Brazil → 32 registros (0,01%)
+
+Etapa 7: Tratamento de Preços e Outliers
+
+    - Verificação de preços inválidos (zeros e negativos).
+    - Detecção de outliers para avaliação antes de exclusão.
+    - Outliers representam 7,35% dos dados.
+
+Etapa 8: Criação de Colunas Temporais (Feature Engineering)
+
+    Geração de variáveis derivadas de InvoiceDate: mês, dia da semana, sazonalidade.
+
+Conclusão
+
+    Após todas as etapas de limpeza, os dados foram:
+
+    - Corrigidos quanto a tipos inconsistentes.
+    - Padronizados e sem duplicatas.
+    - Ajustados quanto a devoluções, outliers e preços inválidos.
+    - Enriquecidos com variáveis temporais.
+    - Os dados finais foram salvos para análise posterior.

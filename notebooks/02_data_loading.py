@@ -109,3 +109,50 @@ contagem_paises = df['Country'].value_counts()
 porcentagem_paises = (contagem_paises / len(df) * 100 )
 print(f"Total de Registro por País: {contagem_paises}\n")
 print(f"Percentual de Registros por País: {porcentagem_paises.round(2)}\n")
+
+# --------- Passo 8: Verificação de Outliers ---------------------
+
+#checagem de preços inválidos
+(df['UnitPrice'] <= 0).sum()
+
+df['UnitPrice'].describe()
+
+#Utilizando o IQR para detectar outliers
+Q1 = df['UnitPrice'].quantile(0.25)
+Q3 = df['UnitPrice'].quantile(0.75)
+IQR = Q3 - Q1
+lower = Q1 - 1.5*IQR
+upper = Q3 + 1.5*IQR
+
+outliers_price = df[(df['UnitPrice'] < lower) | (df['UnitPrice'] > upper)]
+len(outliers_price)
+
+print(F"\n Valores fora de padrão: {outliers_price.head()}")
+
+#calculando a porcentagem
+porcentagem_outliers = (len(outliers_price) / len(df)) * 100
+print(f"\n Outliers representam {porcentagem_outliers:.2f}% dos dados")
+
+#criando uma nova tabela para guardar os Outliers
+tabela_outliers = outliers_price.copy()
+print("\nTabela de Outliers:")
+print(tabela_outliers.head())
+
+#salvamento do arquivo OUTLIERS
+#tabela_outliers.to_csv("reports/tabela_outliers.csv", index=False)
+
+# --------- Passo 9: Criação de colunas temporais ---------------------
+
+df['order_date'] = df['InvoiceDate'].dt.date
+df['order_mouth'] = df['InvoiceDate'].dt.to_period('M').astype(str)
+df['order_year'] = df['InvoiceDate'].dt.year
+df['order_dayofweek'] = df['InvoiceDate'].dt.day_name()
+df['order_hour'] = df['InvoiceDate'].dt.hour
+
+# Validação e salvamento dos dados
+df.info()
+df.describe(include='all')
+
+#salvando o CSV tratado
+outh_path = r"C:\Users\jessy\Documents\portfolio-ecommerce\data\processed\vendas_clean.csv"
+df.to_csv(outh_path, index=False)
