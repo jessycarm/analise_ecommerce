@@ -29,7 +29,7 @@ analise_ecommerce/
 - Substituição de valores ausentes.
 - Criação de colunas derivadas (order_year, order_month, order_dayofweek, order_hour).
 
-3.Análise Exploratória (Python)
+3. Análise Exploratória (Python)
 - Verificação de dados faltantes.
 - Identificação de devoluções (is_return).
 
